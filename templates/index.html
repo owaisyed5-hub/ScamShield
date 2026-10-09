@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScamShield | Scam Risk Checker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="brand">ScamShield</div>
+        <p>Understand suspicious messages before you act.</p>
+    </header>
+
+    <main>
+        <section class="panel">
+            <h1>Check suspicious content</h1>
+            <p class="description">
+                Paste a suspicious message below to check for common warning signs.
+            </p>
+
+            <form method="POST">
+                <label for="message">Message to analyze</label>
+                <textarea
+                    id="message"
+                    name="message"
+                    rows="6"
+                    placeholder="Paste a suspicious message here..."
+                    required
+                >{{ message }}</textarea>
+
+                <button type="submit">Analyze message</button>
+            </form>
+        </section>
+
+        {% if result %}
+        <section class="panel result">
+            <h2>Analysis result</h2>
+
+            <p class="risk risk-{{ result.risk|lower }}">
+                {{ result.risk }} Risk
+            </p>
+
+            <h3>Indicators found</h3>
+
+            {% if result.indicators %}
+                <ul>
+                    {% for indicator in result.indicators %}
+                        <li>{{ indicator }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No configured warning indicators were detected.</p>
+            {% endif %}
+
+            <h3>Safety guidance</h3>
+            <p>{{ result.guidance }}</p>
+
+            <p class="disclaimer">
+                This is a preliminary rule-based assessment, not a guarantee
+                that the message is safe or fraudulent.
+            </p>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer>
+        ScamShield — An educational scam-risk assessment project
+    </footer>
+</body>
+</html>
