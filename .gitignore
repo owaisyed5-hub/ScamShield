@@ -1,5 +1,30 @@
 
+# Python virtual environment
 .venv/
+venv/
+
+# Python cache files
 __pycache__/
 *.py[cod]
+.pytest_cache/
+
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+app_before_auth.py
+scamshield_before_auth.db
+
+# Training dataset (keep locally)
+SMSSpamCollection
+
+# OS files
+.DS_Store
+Thumbs.db

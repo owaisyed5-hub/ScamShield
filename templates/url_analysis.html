@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101b38">
+    <title>URL Security Analysis | ScamShield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="app-shell">
+
+{% with active_page='url' %}{% include '_sidebar.html' %}{% endwith %}
+
+<main class="feature-page url-page">
+
+    <header class="fp-topbar">
+
+        <div class="fp-heading">
+            <p class="fp-eyebrow">SCAMSHIELD / LINK SECURITY</p>
+            <h1>URL Security Scanner</h1>
+            <p>Examine a website address for suspicious patterns and known threats.</p>
+        </div>
+
+        <div class="topbar-actions">
+
+            {% if current_user %}
+            <div class="account-info">
+                <div class="account-avatar">{{ current_user.username[0]|upper }}</div>
+                <div class="account-details">
+                    <strong>{{ current_user.username }}</strong>
+                    <span>{{ current_user.email }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <a class="new-scan" href="{{ url_for('home') }}#analyzer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                New analysis
+            </a>
+
+        </div>
+
+    </header>
+
+    <!-- URL input -->
+
+    <section class="url-hero">
+
+        <div class="url-hero-top">
+
+            <span class="url-shield">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.2 8 8 9 4.8-1 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+
+            <div>
+                <strong>Inspect a website address</strong>
+                <small>Enter the URL you want ScamShield to analyse.</small>
+            </div>
+
+        </div>
+
+        <form class="url-form"
+              method="POST"
+              action="{{ url_for('url_check') }}">
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <input
+                type="text"
+                name="url"
+                placeholder="https://example.com"
+                value="{{ entered_url }}"
+                required
+                aria-label="Website URL"
+            >
+
+            <button type="submit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                Analyse URL
+            </button>
+
+        </form>
+
+        <p class="url-helper">
+            Enter a complete website address or domain name.
+            Do not enter passwords, OTPs or private account information.
+        </p>
+
+        {% if error %}
+        <div class="url-error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+    </section>
+
+    <!-- Analysis result -->
+
+    {% if result %}
+
+    <section class="fp-panel url-result">
+
+        <header class="url-result-header">
+
+            <div>
+                <p class="fp-eyebrow">SCAN COMPLETE</p>
+                <h2>Security assessment</h2>
+                <p>Review the findings before visiting this website.</p>
+            </div>
+
+            <span class="fp-risk fp-risk-{{ result.risk|lower }}">
+                {{ result.risk }} Risk
+            </span>
+
+        </header>
+
+        <div class="url-result-body">
+
+            <div class="url-address-box">
+                <small>Analysed website</small>
+                <strong>{{ result.checked_url }}</strong>
+            </div>
+
+            <div class="url-result-grid">
+
+                <article class="url-detail-card">
+                    <h3>Detected category</h3>
+                    <p>{{ result.scam_type or "Unclassified" }}</p>
+                </article>
+
+                <article class="url-detail-card">
+                    <h3>Machine-learning prediction</h3>
+                    <p>{{ result.ml_prediction or "Not available" }}</p>
+                </article>
+
+                <article class="url-detail-card url-full-width">
+                    <h3>Analysis explanation</h3>
+                    <p>{{ result.explanation or "No explanation is available." }}</p>
+                </article>
+
+                <article class="url-detail-card url-full-width">
+                    <h3>Evidence</h3>
+                    <p>{{ result.evidence or "No separate evidence was recorded." }}</p>
+                </article>
+
+                {% if result.indicators %}
+
+                <article class="url-detail-card url-full-width">
+                    <h3>Detected indicators</h3>
+
+                    <ul class="url-indicator-list">
+                        {% for indicator in result.indicators %}
+                        <li>{{ indicator }}</li>
+                        {% endfor %}
+                    </ul>
+                </article>
+
+                {% endif %}
+
+                {% if result.link_note %}
+
+                <article class="url-detail-card url-full-width">
+                    <h3>Website reputation check</h3>
+                    <p>{{ result.link_note }}</p>
+                </article>
+
+                {% endif %}
+
+                <article class="url-detail-card url-full-width">
+                    <h3>Safety recommendations</h3>
+
+                    {% if result.prevention %}
+
+                    <ul class="url-advice-list">
+                        {% for item in result.prevention %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    {% else %}
+
+                    <p>No separate recommendations were recorded.</p>
+
+                    {% endif %}
+                </article>
+
+            </div>
+
+            {% if result.history_id %}
+
+            <a
+                class="url-report-link"
+                href="{{ url_for('download_report', scan_id=result.history_id) }}"
+            >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m-5-4 5 5 5-5M5 20h14"/></svg>
+                Download PDF report
+            </a>
+
+            {% endif %}
+
+            <p class="url-disclaimer">
+                ScamShield provides a preliminary risk assessment.
+                A Low Risk result does not guarantee that a website is safe.
+                Verify websites independently before entering personal,
+                banking or payment information.
+            </p>
+
+        </div>
+
+    </section>
+
+    {% else %}
+
+    <section class="fp-panel url-result">
+        <div class="fp-empty">
+            <strong>Ready to inspect a link?</strong>
+            <p>Your URL security report will appear here after analysis.</p>
+        </div>
+    </section>
+
+    {% endif %}
+
+</main>
+
+</div>
+
+</body>
+</html>

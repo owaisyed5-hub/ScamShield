@@ -1,72 +1,1004 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScamShield | Scam Risk Checker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="theme-color" content="#101b38">
+
+    <title>ScamShield | Security Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
+
 <body>
-    <header>
-        <div class="brand">ScamShield</div>
-        <p>Understand suspicious messages before you act.</p>
-    </header>
 
-    <main>
-        <section class="panel">
-            <h1>Check suspicious content</h1>
-            <p class="description">
-                Paste a suspicious message below to check for common warning signs.
-            </p>
+    <div class="app-shell">
 
-            <form method="POST">
-                <label for="message">Message to analyze</label>
-                <textarea
-                    id="message"
-                    name="message"
-                    rows="6"
-                    placeholder="Paste a suspicious message here..."
-                    required
-                >{{ message }}</textarea>
+        <!-- Sidebar -->
+        <aside class="sidebar">
 
-                <button type="submit">Analyze message</button>
-            </form>
-        </section>
+            <div class="mobile-header">
 
-        {% if result %}
-        <section class="panel result">
-            <h2>Analysis result</h2>
+    <a class="brand" href="#overview">
+        <span class="brand-shield">✓</span>
+        <span>
+            <strong>Scam<span>Shield</span></strong>
+            <small>AI-powered scam detection</small>
+        </span>
+    </a>
 
-            <p class="risk risk-{{ result.risk|lower }}">
-                {{ result.risk }} Risk
-            </p>
+    <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobileNavigation"
+    >
+        ☰
+    </button>
 
-            <h3>Indicators found</h3>
+</div>
 
-            {% if result.indicators %}
-                <ul>
-                    {% for indicator in result.indicators %}
-                        <li>{{ indicator }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No configured warning indicators were detected.</p>
-            {% endif %}
+            <p class="nav-caption">WORKSPACE</p>
 
-            <h3>Safety guidance</h3>
-            <p>{{ result.guidance }}</p>
+            <!-- Main Navigation -->
+            <nav class="side-nav" id="mobileNavigation">
 
-            <p class="disclaimer">
-                This is a preliminary rule-based assessment, not a guarantee
-                that the message is safe or fraudulent.
-            </p>
-        </section>
+                <a class="nav-link active" href="#overview">
+                    <b>▦</b>
+                    Dashboard
+                </a>
+
+                <a class="nav-link" href="#analyzer">
+                    <b>⌕</b>
+                    Analyze Message
+                </a>
+
+                <a class="nav-link" href="#screenshot">
+                    <b>▧</b>
+                    Screenshot Analysis
+                </a>
+
+                <a class="nav-link" href="{{ url_for('scan_history') }}">
+                    <b>◷</b>
+                    Scan History
+                </a>
+
+                <a class="nav-link" href="{{ url_for('statistics') }}">
+                    <b>▥</b>
+                    Statistics
+                </a>
+
+                <a class="nav-link" href="{{ url_for('url_check') }}">
+                    <b>↗</b>
+                    URL Analysis
+                </a>
+
+
+
+
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <div class="system-card">
+
+                    <i></i>
+
+                    <span>
+                        <strong>Analysis system</strong>
+                        <small>Ready for a new scan</small>
+                    </span>
+
+                    <b>✓</b>
+
+                </div>
+
+                <small class="sidebar-note">
+                    An educational scam-risk assessment project.
+                </small>
+
+
+<form method="POST" action="{{ url_for('logout') }}" style="margin-top: 18px; width: 100%;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button
+        type="submit"
+        style="
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 13px 16px;
+            background: rgba(239, 68, 68, 0.10);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+            border-radius: 10px;
+            color: #fca5a5;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        "
+        onmouseover="this.style.background='rgba(239, 68, 68, 0.20)'"
+        onmouseout="this.style.background='rgba(239, 68, 68, 0.10)'"
+    >
+        <span style="font-size: 18px;">↪</span>
+        Sign out
+    </button>
+</form>
+
+
+            </div>
+
+        </aside>
+
+
+        <!-- Dashboard Header -->
+<header class="topbar">
+
+    <div>
+        <p class="eyebrow">SCAMSHIELD WORKSPACE</p>
+
+        <h1>Security Dashboard</h1>
+
+        <p class="subtitle">
+            Analyze suspicious messages, links and screenshots.
+        </p>
+    </div>
+
+    <div class="topbar-actions">
+
+        {% if current_user %}
+        <div class="account-info">
+            <div class="account-avatar">
+                {{ current_user.username[0]|upper }}
+            </div>
+
+            <div class="account-details">
+                <strong>{{ current_user.username }}</strong>
+                <span>{{ current_user.email }}</span>
+            </div>
+        </div>
         {% endif %}
-    </main>
 
-    <footer>
-        ScamShield — An educational scam-risk assessment project
-    </footer>
+        <a class="new-scan" href="#analyzer">
+            ＋ New analysis
+        </a>
+
+    </div>
+
+</header>
+
+
+            <!-- Hero Banner -->
+            <section class="hero">
+
+                <div class="hero-content">
+
+                    <span class="hero-kicker">
+                        <i></i>
+                        YOUR DIGITAL SAFETY COMPANION
+                    </span>
+
+                    <h2>
+                        Stay alert.<br>
+                        <em>Stay safe.</em>
+                    </h2>
+
+                    <p>
+                        Understand suspicious content before you act.
+                        Check warning signs and get clear, practical guidance.
+                    </p>
+
+                    <a href="#analyzer" class="hero-button">
+                        Start an analysis
+                        <b>→</b>
+                    </a>
+
+                </div>
+
+                <div class="hero-visual" aria-hidden="true">
+
+                    <span class="orbit"></span>
+                    <span class="orbit orbit-small"></span>
+
+                    <div class="big-shield">✓</div>
+
+                    <span class="float f1">✉</span>
+                    <span class="float f2">▤</span>
+                    <span class="float f3">!</span>
+
+                </div>
+
+            </section>
+
+
+            <!-- Feature Cards -->
+            <section class="feature-grid" aria-label="ScamShield capabilities">
+
+                <a href="#analyzer" class="feature-card blue">
+
+                    <span class="feature-icon">⌕</span>
+
+                    <div>
+                        <small>MESSAGE ANALYSIS</small>
+                        <strong>Text checks</strong>
+                        <p>Warning signs &amp; patterns</p>
+                    </div>
+
+                </a>
+
+
+                <a href="#screenshot" class="feature-card purple">
+
+                    <span class="feature-icon">▧</span>
+
+                    <div>
+                        <small>SCREENSHOT OCR</small>
+                        <strong>Image to text</strong>
+                        <p>Gemini with local OCR fallback</p>
+                    </div>
+
+                </a>
+
+
+                <a href="{{ url_for('url_check') }}" class="feature-card orange">
+
+                    <span class="feature-icon">◎</span>
+
+                    <div>
+                        <small>URL CHECKING</small>
+                        <strong>URL safety</strong>
+                        <p>Google Safe Browsing checks</p>
+                    </div>
+
+                </a>
+
+
+                <a href="{{ url_for('scan_history') }}" class="feature-card green">
+
+                    <span class="feature-icon">◷</span>
+
+                    <div>
+                        <small>SCAN HISTORY</small>
+                        <strong>Previous scans</strong>
+                        <p>Review saved analysis results</p>
+                    </div>
+
+                </a>
+
+            </section>
+
+
+            <!-- Dashboard Content -->
+            <section class="dashboard-grid">
+
+                <div class="left-column">
+
+
+                    <!-- Message Analyzer -->
+                    <section class="card analyzer-card" id="analyzer">
+
+                        <div class="section-title">
+
+                            <span class="title-icon blue-icon">ϟ</span>
+
+                            <div>
+                                <h2>Quick analysis</h2>
+
+                                <p>
+                                    Paste a message to inspect it for common scam indicators.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Message Analysis Form -->
+                        <form
+                            method="POST"
+                            enctype="multipart/form-data"
+                            class="analysis-form"
+                        >
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                            <label for="message">
+                                Message to analyze
+                            </label>
+
+                            <textarea
+                                id="message"
+                                name="message"
+                                rows="7"
+                                placeholder="Paste a suspicious SMS, email, WhatsApp message or link here..."
+                            >{{ message }}</textarea>
+
+
+                            <p class="privacy-hint">
+                                <span>i</span>
+                                Avoid entering real passwords, OTPs, PINs or other sensitive information.
+                            </p>
+
+
+                            <!-- Analyze Message Button -->
+                            <button
+                                type="submit"
+                                name="action"
+                                value="analyze"
+                                class="primary-button"
+                            >
+                                Analyze message
+                                <b>→</b>
+                            </button>
+
+
+                            <div class="divider">
+                                <span>OR ANALYZE A SCREENSHOT</span>
+                            </div>
+
+
+                            <!-- Screenshot Upload -->
+                            <div class="upload-box" id="screenshot">
+
+                                <span class="upload-icon">▧</span>
+
+                                <div class="upload-copy">
+
+                                    <strong>
+                                        Upload a message screenshot
+                                    </strong>
+
+                                    <p>
+                                        Choose an SMS or chat screenshot.
+                                        ScamShield will extract the text for you.
+                                    </p>
+
+                                </div>
+
+
+                                <label
+                                    class="file-button"
+                                    for="screenshot-file"
+                                >
+                                    Choose image
+                                </label>
+
+
+                                <input
+                                    type="file"
+                                    id="screenshot-file"
+                                    name="screenshot"
+                                    accept="image/png,image/jpeg,image/webp"
+                                >
+
+                            </div>
+
+
+                            <!-- Screenshot Preview -->
+                            <img
+                                id="image-preview"
+                                alt="Selected screenshot preview"
+                                class="image-preview"
+                                style="display: none;"
+                            >
+
+
+                            <!-- Extract Screenshot Button -->
+                            <button
+                                type="submit"
+                                name="action"
+                                value="extract"
+                                class="secondary-button"
+                            >
+                                Extract text from screenshot
+                                <b>↗</b>
+                            </button>
+
+
+                            <!-- Extraction Error -->
+                            {% if extraction_error %}
+
+                                <p class="notice error">
+                                    {{ extraction_error }}
+                                </p>
+
+                            {% endif %}
+
+
+                            <!-- Multiple Messages Warning -->
+                            {% if multiple_messages %}
+
+                                <div class="notice warning">
+
+                                    <strong>
+                                        Multiple messages detected
+                                    </strong>
+
+                                    <p>
+                                        More than one message or notification may be present.
+                                        For a more accurate result, upload one individual
+                                        message at a time. You can still review and edit
+                                        the extracted text.
+                                    </p>
+
+                                </div>
+
+                            {% endif %}
+
+                        </form>
+
+                    </section>
+
+
+
+                    <!-- Analysis Result -->
+                    {% if result %}
+
+                        <section class="card result-card" id="results">
+
+                            <div class="result-head">
+
+                                <div>
+                                    <p class="eyebrow">SCAN SUMMARY</p>
+                                    <h2>Analysis result</h2>
+                                </div>
+
+                                <span class="risk-badge risk-{{ result.risk|lower }}">
+                                    {{ result.risk }} Risk
+                                </span>
+
+                            </div>
+
+
+                            <!-- PDF Download -->
+                            {% if result.history_id %}
+
+                                <div class="report-download">
+
+                                    <a
+                                        href="{{ url_for('download_report', scan_id=result.history_id) }}"
+                                        class="secondary-button"
+                                    >
+                                        Download PDF Report
+                                        <b>↓</b>
+                                    </a>
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- URL Safety Information -->
+                            {% if result.link_note %}
+
+                                <div class="notice info">
+                                    {{ result.link_note }}
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Indicators -->
+                            {% if result.indicators %}
+
+                                <div class="result-section">
+
+                                    <h3>
+                                        <i>⌁</i>
+                                        Indicators found
+                                    </h3>
+
+                                    <ul class="detail-list">
+
+                                        {% for indicator in result.indicators %}
+
+                                            <li>{{ indicator }}</li>
+
+                                        {% endfor %}
+
+                                    </ul>
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Scam Category -->
+                            <div class="result-section">
+
+                                <h3>
+                                    <i>◈</i>
+                                    Likely message category
+                                </h3>
+
+                                <p>
+                                    {{ result.scam_type }}
+                                </p>
+
+                            </div>
+
+
+                            <!-- AI Explanation -->
+                            <div class="result-section highlighted">
+
+                                <h3>
+                                    <i>✧</i>
+                                    Why did ScamShield give this result?
+                                </h3>
+
+                                <p>
+                                    {{ result.explanation }}
+                                </p>
+
+                            </div>
+
+
+                            <!-- Evidence -->
+                            {% if result.evidence %}
+
+                                <div class="result-section evidence">
+
+                                    <h3>
+                                        <i>“ ”</i>
+                                        Evidence found in the message
+                                    </h3>
+
+                                    <p>
+                                        {{ result.evidence }}
+                                    </p>
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Prevention Advice -->
+                            <div class="result-section">
+
+                                <h3>
+                                    <i>✓</i>
+                                    How to protect yourself
+                                </h3>
+
+                                <ul class="detail-list advice">
+
+                                    {% for advice in result.prevention %}
+
+                                        <li>{{ advice }}</li>
+
+                                    {% endfor %}
+
+                                </ul>
+
+                            </div>
+
+
+                            <!-- Machine Learning Result -->
+                            <div class="ml-card">
+
+                                <div class="ml-heading">
+
+                                    <span>✧</span>
+
+                                    <div>
+                                        <strong>Machine Learning Analysis</strong>
+                                        <small>Classifier output</small>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="ml-metrics">
+
+                                    <div>
+                                        <small>Prediction</small>
+
+                                        <strong>
+                                            {{ result.ml_prediction }}
+                                        </strong>
+                                    </div>
+
+
+                                    <div>
+                                        <small>Model confidence</small>
+
+                                        <strong>
+                                            {{ result.ml_confidence }}%
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Disclaimer -->
+                            <p class="disclaimer">
+                                This is a preliminary assessment combining configured
+                                warning rules and an ML spam classifier. It cannot
+                                guarantee that a message is safe or fraudulent.
+                            </p>
+
+                        </section>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- Right Sidebar Cards -->
+                <aside class="right-column">
+
+
+                    <!-- How It Works -->
+                    <section class="card side-card">
+
+                        <div class="section-title">
+
+                            <span class="title-icon purple-icon">✧</span>
+
+                            <div>
+                                <h2>How it works</h2>
+
+                                <p>
+                                    Multiple checks help explain potential risks.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="steps">
+
+                            <div>
+                                <b>01</b>
+
+                                <span>
+                                    <strong>Content inspection</strong>
+
+                                    <small>
+                                        Checks message text for configured warning signs.
+                                    </small>
+                                </span>
+                            </div>
+
+
+                            <div>
+                                <b>02</b>
+
+                                <span>
+                                    <strong>URL reputation</strong>
+
+                                    <small>
+                                        Checks supported links against known threat reports.
+                                    </small>
+                                </span>
+                            </div>
+
+
+                            <div>
+                                <b>03</b>
+
+                                <span>
+                                    <strong>AI explanation</strong>
+
+                                    <small>
+                                        Generates category, reasoning, evidence and safety advice.
+                                    </small>
+                                </span>
+                            </div>
+
+
+                            <div>
+                                <b>04</b>
+
+                                <span>
+                                    <strong>Risk assessment</strong>
+
+                                    <small>
+                                        Displays a preliminary risk level for you to review.
+                                    </small>
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+
+                    <!-- Safety Reminders -->
+                    <section class="card side-card">
+
+                        <div class="section-title">
+
+                            <span class="title-icon green-icon">✓</span>
+
+                            <div>
+                                <h2>Safety reminders</h2>
+                                <p>Keep these basics in mind.</p>
+                            </div>
+
+                        </div>
+
+
+                        <ul class="safety-list">
+
+                            <li>
+                                <i>✓</i>
+                                Never share your OTP, UPI PIN or password.
+                            </li>
+
+                            <li>
+                                <i>✓</i>
+                                Verify payment requests through official apps.
+                            </li>
+
+                            <li>
+                                <i>✓</i>
+                                Don't rush because a message creates urgency.
+                            </li>
+
+                            <li>
+                                <i>✓</i>
+                                Open trusted websites directly instead of unknown links.
+                            </li>
+
+                        </ul>
+
+                    </section>
+
+
+
+                    <!-- New Feature Shortcuts -->
+                    <section class="card side-card">
+
+                        <div class="section-title">
+
+                            <span class="title-icon blue-icon">▦</span>
+
+                            <div>
+                                <h2>More tools</h2>
+                                <p>Explore your ScamShield features.</p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="steps">
+
+                            <div>
+                                <b>01</b>
+
+                                <span>
+                                    <strong>
+                                        <a href="{{ url_for('scan_history') }}">
+                                            Scan History
+                                        </a>
+                                    </strong>
+
+                                    <small>
+                                        View and manage your previous scans.
+                                    </small>
+                                </span>
+                            </div>
+
+
+                            <div>
+                                <b>02</b>
+
+                                <span>
+                                    <strong>
+                                        <a href="{{ url_for('statistics') }}">
+                                            Risk Statistics
+                                        </a>
+                                    </strong>
+
+                                    <small>
+                                        Explore saved scan counts and risk distribution.
+                                    </small>
+                                </span>
+                            </div>
+
+
+                            <div>
+                                <b>03</b>
+
+                                <span>
+                                    <strong>
+                                        <a href="{{ url_for('url_check') }}">
+                                            URL-only Analysis
+                                        </a>
+                                    </strong>
+
+                                    <small>
+                                        Check a suspicious URL separately.
+                                    </small>
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+
+                    <!-- Help Card -->
+                    <section class="help-card">
+
+                        <span>?</span>
+
+                        <h3>Not sure about a message?</h3>
+
+                        <p>
+                            Run an analysis and review the warning signs
+                            before taking action.
+                        </p>
+
+                        <a href="#analyzer">
+                            Check a message →
+                        </a>
+
+                    </section>
+
+                </aside>
+
+            </section>
+
+
+
+            <!-- Footer -->
+            <footer class="page-footer">
+
+                <strong>ScamShield</strong>
+
+                <span>
+                    Educational scam-risk assessment project
+                </span>
+
+            </footer>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- Screenshot Preview JavaScript -->
+    <script>
+
+        const screenshotInput =
+            document.getElementById("screenshot-file");
+
+        const imagePreview =
+            document.getElementById("image-preview");
+
+
+        screenshotInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+
+            if (imagePreview.dataset.objectUrl) {
+
+                URL.revokeObjectURL(
+                    imagePreview.dataset.objectUrl
+                );
+
+            }
+
+
+            if (file) {
+
+                const objectUrl = URL.createObjectURL(file);
+
+                imagePreview.src = objectUrl;
+
+                imagePreview.dataset.objectUrl = objectUrl;
+
+                imagePreview.style.display = "block";
+
+            } else {
+
+                imagePreview.removeAttribute("src");
+
+                delete imagePreview.dataset.objectUrl;
+
+                imagePreview.style.display = "none";
+
+            }
+
+        });
+
+    </script>
+
+
+
+    <!-- Sidebar Navigation Active State -->
+    <script>
+
+        const navLinks = document.querySelectorAll(
+            ".side-nav .nav-link"
+        );
+
+        navLinks.forEach(link => {
+
+            link.addEventListener("click", function () {
+
+                navLinks.forEach(nav => {
+                    nav.classList.remove("active");
+                });
+
+                this.classList.add("active");
+
+            });
+
+        });
+
+    </script>
+
+
+<!-- Mobile Hamburger Menu -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const menuToggle = document.getElementById("menuToggle");
+    const mobileNavigation = document.getElementById("mobileNavigation");
+
+    if (!menuToggle || !mobileNavigation) {
+        return;
+    }
+
+    menuToggle.addEventListener("click", function () {
+
+        const isOpen = mobileNavigation.classList.toggle("show-menu");
+
+        menuToggle.textContent = isOpen ? "✕" : "☰";
+
+        menuToggle.setAttribute("aria-expanded", isOpen);
+
+        menuToggle.setAttribute(
+            "aria-label",
+            isOpen ? "Close navigation menu" : "Open navigation menu"
+        );
+
+    });
+
+    // Close menu after selecting a link
+    mobileNavigation.querySelectorAll(".nav-link").forEach(function (link) {
+
+        link.addEventListener("click", function () {
+
+            mobileNavigation.classList.remove("show-menu");
+
+            menuToggle.textContent = "☰";
+
+            menuToggle.setAttribute("aria-expanded", "false");
+
+            menuToggle.setAttribute("aria-label", "Open navigation menu");
+
+        });
+
+    });
+
+});
+</script>
+
 </body>
 </html>

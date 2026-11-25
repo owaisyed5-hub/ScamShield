@@ -1,0 +1,215 @@
+
+{# =====================================================================
+   Shared ScamShield sidebar.
+   Include it from a page like this:
+
+   {% with active_page='history' %}
+       {% include '_sidebar.html' %}
+   {% endwith %}
+
+   active_page: 'dashboard' | 'history' | 'statistics' | 'url'
+   ===================================================================== #}
+
+<aside class="sidebar">
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+
+        <a class="brand" href="{{ url_for('home') }}">
+
+            <span class="brand-shield">✓</span>
+
+            <span>
+                <strong>Scam<span>Shield</span></strong>
+                <small>AI-powered scam detection</small>
+            </span>
+
+        </a>
+
+        <!-- Mobile Hamburger Button -->
+        <button
+            class="menu-toggle"
+            id="menuToggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="mobileNavigation"
+        >
+            ☰
+        </button>
+
+    </div>
+
+
+    <p class="nav-caption">WORKSPACE</p>
+
+
+    <!-- Main Navigation -->
+    <nav class="side-nav" id="mobileNavigation" aria-label="Workspace">
+
+        <a
+            class="nav-link{% if active_page == 'dashboard' %} active{% endif %}"
+            href="{{ url_for('home') }}"
+            {% if active_page == 'dashboard' %}aria-current="page"{% endif %}
+        >
+            <b>▦</b>
+            Dashboard
+        </a>
+
+
+        <a class="nav-link" href="{{ url_for('home') }}#analyzer">
+            <b>⌕</b>
+            Analyze Message
+        </a>
+
+
+        <a class="nav-link" href="{{ url_for('home') }}#screenshot">
+            <b>▧</b>
+            Screenshot Analysis
+        </a>
+
+
+        <a
+            class="nav-link{% if active_page == 'history' %} active{% endif %}"
+            href="{{ url_for('scan_history') }}"
+            {% if active_page == 'history' %}aria-current="page"{% endif %}
+        >
+            <b>◷</b>
+            Scan History
+        </a>
+
+
+        <a
+            class="nav-link{% if active_page == 'statistics' %} active{% endif %}"
+            href="{{ url_for('statistics') }}"
+            {% if active_page == 'statistics' %}aria-current="page"{% endif %}
+        >
+            <b>▥</b>
+            Statistics
+        </a>
+
+
+        <a
+            class="nav-link{% if active_page == 'url' %} active{% endif %}"
+            href="{{ url_for('url_check') }}"
+            {% if active_page == 'url' %}aria-current="page"{% endif %}
+        >
+            <b>↗</b>
+            URL Analysis
+        </a>
+
+    </nav>
+
+
+    <!-- Sidebar Bottom -->
+    <div class="sidebar-bottom">
+
+        <div class="system-card">
+
+            <i></i>
+
+            <span>
+                <strong>Analysis system</strong>
+                <small>Ready for a new scan</small>
+            </span>
+
+            <b>✓</b>
+
+        </div>
+
+
+        <small class="sidebar-note">
+            An educational scam-risk assessment project.
+        </small>
+
+
+        <!-- Sign Out -->
+        <form
+            method="POST"
+            action="{{ url_for('logout') }}"
+            style="margin-top: 18px; width: 100%;"
+        >
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <button
+                type="submit"
+                style="
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    padding: 13px 16px;
+                    background: rgba(239, 68, 68, 0.10);
+                    border: 1px solid rgba(248, 113, 113, 0.25);
+                    border-radius: 10px;
+                    color: #fca5a5;
+                    font-size: 14px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: background 0.2s ease;
+                "
+                onmouseover="this.style.background='rgba(239, 68, 68, 0.20)'"
+                onmouseout="this.style.background='rgba(239, 68, 68, 0.10)'"
+            >
+                <span style="font-size: 18px;">↪</span>
+                Sign out
+            </button>
+
+        </form>
+
+    </div>
+
+</aside>
+
+
+<!-- Mobile Menu JavaScript -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const menuToggle = document.getElementById("menuToggle");
+    const mobileNavigation = document.getElementById("mobileNavigation");
+
+    if (!menuToggle || !mobileNavigation) {
+        return;
+    }
+
+    menuToggle.addEventListener("click", function () {
+
+        const isOpen = mobileNavigation.classList.toggle("show-menu");
+
+        menuToggle.textContent = isOpen ? "✕" : "☰";
+
+        menuToggle.setAttribute("aria-expanded", isOpen);
+
+        menuToggle.setAttribute(
+            "aria-label",
+            isOpen ? "Close navigation menu" : "Open navigation menu"
+        );
+
+    });
+
+    // Close the menu after selecting a navigation link
+    mobileNavigation.querySelectorAll(".nav-link").forEach(function (link) {
+
+        link.addEventListener("click", function () {
+
+            mobileNavigation.classList.remove("show-menu");
+
+            menuToggle.textContent = "☰";
+
+            menuToggle.setAttribute("aria-expanded", "false");
+
+            menuToggle.setAttribute("aria-label", "Open navigation menu");
+
+        });
+
+    });
+
+});
+</script>
