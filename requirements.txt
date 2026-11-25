@@ -1,4 +1,14 @@
 
 Flask>=3.1,<4.0
-
 Flask-WTF
+gunicorn
+python-dotenv
+requests
+google-genai
+groq
+Pillow
+pytesseract
+scikit-learn
+joblib
+psycopg[binary]
+reportlab
