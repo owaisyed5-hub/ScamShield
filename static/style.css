@@ -804,6 +804,49 @@ textarea:focus {
 .result-card {
     border-top: 3px solid #477ce8;
 }
+
+.message-check-page .fp-topbar {
+    margin-bottom: 22px;
+}
+
+.message-check-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(260px, .8fr);
+    align-items: start;
+    gap: 18px;
+}
+
+.message-check-result,
+.message-original-panel {
+    padding: 24px;
+}
+
+.message-original {
+    margin: 14px 0 0;
+    padding: 16px;
+    border: 1px solid #e6ebf4;
+    border-radius: 12px;
+    background: #f8faff;
+    color: #34425c;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.message-check-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+@media (max-width: 850px) {
+    .message-check-grid {
+        grid-template-columns: 1fr;
+    }
+}
 .result-head {
     display: flex;
     align-items: center;

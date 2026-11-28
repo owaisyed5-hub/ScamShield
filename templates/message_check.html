@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101b38">
+    <title>Message Check Results | ScamShield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+    {% with active_page='dashboard' %}{% include '_sidebar.html' %}{% endwith %}
+
+    <main class="feature-page message-check-page">
+        <header class="fp-topbar">
+            <div class="fp-heading">
+                <p class="fp-eyebrow">SCAMSHIELD / MESSAGE CHECK</p>
+                <h1>Your analysis results</h1>
+                <p>Review the warning signs and practical guidance for this message.</p>
+            </div>
+
+            <div class="topbar-actions">
+                {% if current_user %}
+                <div class="account-info">
+                    <div class="account-avatar">{{ current_user.username[0]|upper }}</div>
+                    <div class="account-details">
+                        <strong>{{ current_user.username }}</strong>
+                        <span>{{ current_user.email }}</span>
+                    </div>
+                </div>
+                {% endif %}
+                <a class="new-scan" href="{{ url_for('home') }}#analyzer">New analysis</a>
+            </div>
+        </header>
+
+        <a class="fp-back" href="{{ url_for('home') }}#analyzer">← Back to dashboard</a>
+
+        <div class="message-check-grid">
+            <section class="fp-panel result-card message-check-result" aria-labelledby="result-title">
+                <div class="result-head">
+                    <div>
+                        <p class="fp-eyebrow">SCAN SUMMARY</p>
+                        <h2 id="result-title">Analysis result</h2>
+                    </div>
+                    <span class="risk-badge risk-{{ result.risk|lower }}">{{ result.risk }} Risk</span>
+                </div>
+
+                <div class="message-check-actions">
+                    <a class="secondary-button" href="{{ url_for('download_report', scan_id=scan.id) }}">Download PDF report</a>
+                    <a class="new-scan" href="{{ url_for('scan_history') }}">Scan history</a>
+                </div>
+
+                {% if result.link_note %}
+                <div class="notice info" role="status">{{ result.link_note }}</div>
+                {% endif %}
+
+                {% if result.indicators %}
+                <section class="result-section">
+                    <h3><i aria-hidden="true">⌁</i> Indicators found</h3>
+                    <ul class="detail-list">
+                        {% for indicator in result.indicators %}
+                        <li>{{ indicator }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+
+                <section class="result-section">
+                    <h3><i aria-hidden="true">◈</i> Likely message category</h3>
+                    <p>{{ result.scam_type }}</p>
+                </section>
+
+                <section class="result-section highlighted">
+                    <h3><i aria-hidden="true">✧</i> Why did ScamShield give this result?</h3>
+                    <p>{{ result.explanation }}</p>
+                </section>
+
+                {% if result.evidence %}
+                <section class="result-section evidence">
+                    <h3><i aria-hidden="true">“ ”</i> Evidence found in the message</h3>
+                    <p>{{ result.evidence }}</p>
+                </section>
+                {% endif %}
+
+                {% if result.prevention %}
+                <section class="result-section">
+                    <h3><i aria-hidden="true">✓</i> How to protect yourself</h3>
+                    <ul class="detail-list advice">
+                        {% for advice in result.prevention %}
+                        <li>{{ advice }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+
+                <section class="ml-card" aria-label="Machine learning analysis">
+                    <div class="ml-heading">
+                        <span aria-hidden="true">✧</span>
+                        <div>
+                            <strong>Machine Learning Analysis</strong>
+                            <small>Classifier output</small>
+                        </div>
+                    </div>
+                    <div class="ml-metrics">
+                        <div>
+                            <small>Prediction</small>
+                            <strong>{{ result.ml_prediction }}</strong>
+                        </div>
+                        <div>
+                            <small>Model confidence</small>
+                            <strong>{{ result.ml_confidence }}%</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <p class="disclaimer">
+                    ScamShield provides an educational assessment, not a guarantee. Verify important requests directly with the organization through its official website or app.
+                </p>
+            </section>
+
+            <aside class="fp-panel message-original-panel">
+                <p class="fp-eyebrow">MESSAGE REVIEWED</p>
+                <h2 class="fp-section-title">Original message</h2>
+                <pre class="message-original">{{ scan.message }}</pre>
+                <p class="fp-section-subtitle">Check suspicious requests through a trusted channel. Never share passwords, PINs, or one-time codes.</p>
+            </aside>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -228,6 +228,14 @@
 
         <a
             class="history-download-btn"
+            href="{{ url_for('message_check', scan_id=scan.id) }}"
+            aria-label="View analysis result"
+        >
+            View
+        </a>
+
+        <a
+            class="history-download-btn"
             href="{{ url_for('download_report', scan_id=scan.id) }}"
             title="Download PDF report"
         >

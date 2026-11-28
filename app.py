@@ -3154,6 +3154,8 @@ def home():
 
 
 
+    message_error = None
+
     if request.method == "POST":
 
 
@@ -3255,11 +3257,15 @@ def home():
 
                 result = analyze_message(message)
 
-
-
-                result["history_id"] = save_scan(
-                    message, result, "screenshot" if request.files.get("screenshot") else "message"
+                history_id = save_scan(
+                    message,
+                    result,
+                    "screenshot" if request.files.get("screenshot") else "message"
                 )
+
+                return redirect(url_for("message_check", scan_id=history_id))
+
+            message_error = "Enter a message to analyze, or choose Extract text from screenshot."
 
 
 
@@ -3273,7 +3279,9 @@ def home():
 
         extraction_error=extraction_error,
 
-        multiple_messages=multiple_messages
+        multiple_messages=multiple_messages,
+
+        message_error=message_error
 
     )
 
@@ -3290,7 +3298,44 @@ def home():
 
 
 
+@app.route("/message-check/<int:scan_id>")
+@login_required
+def message_check(scan_id):
+    user_id = session["user_id"]
 
+    with get_db_connection() as connection:
+        scan = connection.execute(
+            """
+            SELECT * FROM scan_history
+            WHERE id = %s AND user_id = %s
+            """,
+            (scan_id, user_id)
+        ).fetchone()
+
+    if scan is None:
+        abort(404)
+
+    def decode_list(value):
+        try:
+            decoded = json.loads(value or "[]")
+        except (TypeError, json.JSONDecodeError):
+            return []
+        return decoded if isinstance(decoded, list) else []
+
+    result = {
+        "risk": scan["risk"] or "Medium",
+        "scam_type": scan["scam_type"] or "Unclassified",
+        "explanation": scan["explanation"] or "No explanation was saved.",
+        "evidence": scan["evidence"] or "",
+        "prevention": decode_list(scan["prevention_json"]),
+        "indicators": decode_list(scan["indicators_json"]),
+        "ml_prediction": scan["ml_prediction"] or "Not available",
+        "ml_confidence": scan["ml_confidence"] or 0,
+        "link_note": scan["link_note"] or "",
+        "history_id": scan["id"]
+    }
+
+    return render_template("message_check.html", scan=scan, result=result)
 
 
 # -----------------------------------------------------------------------------

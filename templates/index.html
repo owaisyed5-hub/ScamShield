@@ -328,6 +328,9 @@
                                 placeholder="Paste a suspicious SMS, email, WhatsApp message or link here..."
                             >{{ message }}</textarea>
 
+                            {% if message_error %}
+                                <p class="notice error" role="alert">{{ message_error }}</p>
+                            {% endif %}
 
                             <p class="privacy-hint">
                                 <span>i</span>
